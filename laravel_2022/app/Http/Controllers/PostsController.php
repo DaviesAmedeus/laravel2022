@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
  
@@ -83,18 +84,47 @@ class PostsController extends Controller
     */
         // $posts= DB::table('posts')->find(1);
         // return view('blog.index')->with('posts', $posts);  //OR
-    return view('blog.index',[
+    /*return view('blog.index',[
         'posts'=>DB::table('posts')->get()
-    ]); 
-
-
-
+    ]); */
 
         // $posts= DB::table('posts')->get();
         // return view('blog.index', compact('posts')); //return a pile of array
 
 
+    /*
+    |--------------------------------------------------------------------------
+    |RETRIEVIG DATA USING ELOQUENT
+    |--------------------------------------------------------------------------
+    */
 
+    /*
+    //all() does not support method chaining while get() supports method chaining
+    $posts = Post::all();
+    $posts = Post::get();
+    */
+
+    // $posts = Post::orderBy('id', 'desc')->take(10)->get();
+    // $posts = Post::where('min_to_read', 2)->take(10)->get();
+
+    /*Post::chunk(25, function($posts){
+        foreach($posts as $post){
+            echo $post->title.'<br>';
+        }
+    });
+ */
+/* ------------Aggregate functions--------*/
+//  $posts = Post::get()->count();
+//  $posts = Post::get()->sum('min_to_read');
+//  $posts = Post::get()->avg('min_to_read');
+
+
+/* ------------sending to the blade--------*/
+
+
+    return view('blog.index', [
+        'posts'=> Post::orderBy('updated_at', 'desc')->get(),
+    ]);
 
     }
 
@@ -105,7 +135,8 @@ class PostsController extends Controller
      */
     public function create()
     {
-        //
+            //returns a form to that data is inserted
+        return view('blog.create'); 
     }
 
     /**
@@ -115,9 +146,38 @@ class PostsController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-        //
-    }
+    {   
+        /* -----OLDWAY OF OOP ----*/
+        // $post = new Post();
+        // $post->title = $request->title;
+        // $post->excerpt = $request->excerpt;
+        // $post->body = $request->body;
+        // $post->image_path = 'temporary';
+        // $post->is_published = $request->is_published === 'on'; 
+        // $post->min_to_read = $request->min_to_read;
+        // $post->save();
+
+        /* -----form valiation (Which can be optional but for security and consistence it is better----*/
+        $request->validate([
+            'title' => 'required|unique:posts|max:255',
+            'excerpt' => 'required',
+            'body' => 'required',
+            'image' => ['required', 'mimes:png,jpg,jpeg', 'max:5048'],
+            'min_to_read' => 'min:0|max:60',
+
+        ]);
+        /* -----ELOQUENT WAY OF INSERTING DATA ----*/
+        Post::create([
+            'title' => $request->title,
+            'excerpt' => $request->excerpt,
+            'body' => $request->body,
+            'image_path' => $this->storeImage($request),
+            'is_published' => $request->is_published === 'on',
+            'min_to_read' => $request->min_to_read,
+        ]);
+
+        return redirect(route('blog.index'));
+       }
 
     /**
      * Display the specified resource.
@@ -125,9 +185,20 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id =1)
+    public function show($id)
     {
-        return $id;
+        /* ------------
+        find() v/s  findOrFail()
+        find() returns null if the parameter route is not available
+        findOrFail() returns 404 page (good one!)
+
+        --------*/
+        // $post = Post::find($id);
+        // $post = Post::findOrFail($id);
+
+        return view('blog.show',[
+            'post'=> Post::findOrFail($id),
+        ]);
     }
 
     /**
@@ -138,7 +209,9 @@ class PostsController extends Controller
      */
     public function edit($id)
     {
-        //
+       return view('blog.edit', [
+        'post'=> Post::where('id',  $id)->first()
+       ]);
     }
 
     /**
@@ -150,7 +223,25 @@ class PostsController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:255|unique:posts,id',
+            'excerpt' => 'required',
+            'body' => 'required',
+            'image' => ['mimes:png,jpg,jpeg', 'max:5048'],
+            'min_to_read' => 'min:0|max:60',
+            
+         
+
+        ]);
+       
+
+       Post::where('id', $id)->update($request->except([
+        '_token', '_method',
+    ]));
+
+   
+
+       return redirect(route('blog.index'));
     }
 
     /**
@@ -162,5 +253,14 @@ class PostsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    //storing of image
+    private function storeImage($request)
+    {
+        //    forming the new image name
+            $newImageName = uniqid().$request->title.'.'.$request->image->extension();
+
+            return $request->image->move(public_path('images', $newImageName));
     }
 }

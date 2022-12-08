@@ -122,11 +122,11 @@ Route::get('/', HomeController::class);
 
 Route::prefix('/blog')->group(function(){
     //GET - request a resource
+  Route::get('/create', [PostsController::class, 'create'])->name('blog.create'); 
   Route::get('/', [PostsController::class, 'index'])->name('blog.index');
   Route::get('/{id}', [PostsController::class, 'show'])->name('blog.show'); 
   
   //POST - create a new resource
-  Route::get('/create', [PostsController::class, 'create'])->name('blog.create'); 
   Route::post('/blog', [PostsController::class, 'store'])->name('blog.store');
   
   //PUT or PATCH - update a  resource
