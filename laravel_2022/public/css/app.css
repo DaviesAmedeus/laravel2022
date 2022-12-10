@@ -551,6 +551,10 @@ video {
   border-top-left-radius: 0.25rem;
   border-top-right-radius: 0.25rem;
 }
+.rounded-b {
+  border-bottom-right-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
 .border {
   border-width: 1px;
 }
@@ -653,6 +657,9 @@ video {
 .pb-3 {
   padding-bottom: 0.75rem;
 }
+.pt-3 {
+  padding-top: 0.75rem;
+}
 .pt-0 {
   padding-top: 0px;
 }
@@ -734,6 +741,10 @@ video {
 .text-green-500 {
   --tw-text-opacity: 1;
   color: rgb(34 197 94 / var(--tw-text-opacity));
+}
+.text-red-500 {
+  --tw-text-opacity: 1;
+  color: rgb(239 68 68 / var(--tw-text-opacity));
 }
 .text-black {
   --tw-text-opacity: 1;

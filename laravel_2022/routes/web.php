@@ -134,7 +134,7 @@ Route::prefix('/blog')->group(function(){
   Route::patch('/{id}', [PostsController::class, 'update'])->name('blog.update');
   
   //DELETE - destroy or remove a  resource
-  Route::delete ('/{id}', [PostsController::class, 'destroy'])->name('blog.desroy');
+  Route::delete ('/{id}', [PostsController::class, 'destroy'])->name('blog.destroy');
 });
 
   /*
