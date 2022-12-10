@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Requests\PostFormRequest;
  
 class PostsController extends Controller
 {
@@ -123,7 +124,7 @@ class PostsController extends Controller
 
 
     return view('blog.index', [
-        'posts'=> Post::orderBy('updated_at', 'desc')->get(),
+        'posts'=> Post::orderBy('updated_at', 'desc')->paginate(10),
     ]);
 
     }
@@ -145,7 +146,7 @@ class PostsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(PostFormRequest $request)
     {   
         /* -----OLDWAY OF OOP ----*/
         // $post = new Post();
@@ -158,7 +159,10 @@ class PostsController extends Controller
         // $post->save();
 
         /* -----form valiation (Which can be optional but for security and consistence it is better----*/
-        $request->validate([
+        
+        
+        // 1. -----Validation without formRequest----------
+       /* $request->validate([
             'title' => 'required|unique:posts|max:255',
             'excerpt' => 'required',
             'body' => 'required',
@@ -166,6 +170,13 @@ class PostsController extends Controller
             'min_to_read' => 'min:0|max:60',
 
         ]);
+
+        */
+
+        
+
+        // 2. -----Validation withformRequest----------
+        $request->validated();
         /* -----ELOQUENT WAY OF INSERTING DATA ----*/
         Post::create([
             'title' => $request->title,
@@ -221,18 +232,20 @@ class PostsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(PostFormRequest $request, $id)
     {
+        /*
         $request->validate([
             'title' => 'required|max:255|unique:posts,id',
             'excerpt' => 'required',
             'body' => 'required',
             'image' => ['mimes:png,jpg,jpeg', 'max:5048'],
             'min_to_read' => 'min:0|max:60',
-            
-         
 
         ]);
+        */
+
+        $request->validated();
        
 
        Post::where('id', $id)->update($request->except([
