@@ -6,6 +6,18 @@
         content="width=device-width, initial-scale=1.0"
     />
     <meta
+    name="description"
+    content="{{$post->meta->meta_description ? $post->meta->meta_description : ''}}"
+    />
+    <meta
+        name="keywords"
+        content="{{$post->meta->meta_keywords ? $post->meta->meta_keywords : ''}}"
+    />
+    <meta
+        name="robots"
+        content="{{$post->meta->meta_robots ? $post->meta->meta_robots : ''}}"
+    />
+    <meta
         http-equiv="X-UA-Compatible"
         content="ie=edge"
     />
@@ -31,9 +43,17 @@
             {{$post->title}}
         </h4>
 
+        <p class="pt-4 italic">
+            Categories:
+            @foreach ( $post->categories as $category)
+                {{$category->title}}
+            @endforeach
+        </p>
+
+
         <div class="block lg:flex flex-row">
             <div class="basis-9/12 text-center sm:block sm:text-left">
-                <span class="text-left sm:text-center sm:text-left sm:inline block text-gray-900 pb-10 sm:pt-0 pt-0 sm:pt-10 pl-0 sm:pl-4 -mt-8 sm:-mt-0">
+                <span class="text-left sm:text-center sm:text-left sm:inline block text-gray-900 pb-10 sm:pt-0 pt-0 sm:pt-10 pl-0 -mt-8 sm:-mt-0">
                     Made by:
                     <a
                         href=""

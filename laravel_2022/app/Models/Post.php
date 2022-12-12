@@ -9,7 +9,7 @@ class Post extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'title', 'excerpt', 'body', 'image_path', 'is_published', 'min_to_read'
+        'user_id', 'title', 'excerpt', 'body', 'image_path', 'is_published', 'min_to_read'
     ]; //prevents for inserted filled in the database to be changed.
     
     // protected $table = 'posts'; //Indicating the Model belongs to posts table
@@ -17,6 +17,21 @@ class Post extends Model
     // protected $timestamps = false; //disabling the timestamps in the database table
     // protected $connection = 'sqlite'; //setting specific database connection of the model
     // protected $attributes = ['is_published'=> true,]; //setting defaults value of the fields */
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function meta()
+    {
+        return $this->hasOne(PostMeta::class);
+    }
+
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class);
+    }
 
 
 }

@@ -5,10 +5,14 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\PostFormRequest;
  
 class PostsController extends Controller
 {
+    public function __construct(){
+        $this->middleware('auth')->only(['create', 'edit', 'update', 'destroy']);
+    }
     /**
      * Display a listing of the resource.
      *
@@ -125,6 +129,7 @@ class PostsController extends Controller
 
     return view('blog.index', [
         'posts'=> Post::orderBy('updated_at', 'desc')->paginate(10),
+        
     ]);
 
     }
@@ -173,18 +178,25 @@ class PostsController extends Controller
 
         */
 
-        
-
         // 2. -----Validation withformRequest----------
         $request->validated();
         /* -----ELOQUENT WAY OF INSERTING DATA ----*/
-        Post::create([
+        $post = Post::create([
+            'user_id'=> Auth::id(),
             'title' => $request->title,
             'excerpt' => $request->excerpt,
             'body' => $request->body,
             'image_path' => $this->storeImage($request),
             'is_published' => $request->is_published === 'on',
             'min_to_read' => $request->min_to_read,
+        ]);
+
+        $post->meta()->create([
+            'post_id'=> $post->id,
+            'meta_description'=> $request->meta_description,
+            'meta_keywords'=> $request->meta_keywords,
+            'meta_robots'=> $request->meta_robots,
+
         ]);
 
         return redirect(route('blog.index'));
