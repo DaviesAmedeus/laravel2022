@@ -257,14 +257,26 @@ class PostsController extends Controller
         ]);
         */
 
+    
         $request->validated();
        
 
-       Post::where('id', $id)->update($request->except([
+     $post =   Post::where('id', $id)->update($request->except([
         '_token', '_method',
     ]));
 
+ // I failed to update the metas they bring me errors
+   $post->meta()->update([
+        'post_id'=> $post->id,
+        'meta_description'=> $request->meta_description,
+        'meta_keywords'=> $request->meta_keywords,
+        'meta_robots'=> $request->meta_robots,
+
+    ]);
+
    
+   
+    
 
        return redirect(route('blog.index'));
     }
